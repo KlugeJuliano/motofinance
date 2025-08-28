@@ -62,9 +62,9 @@ class DatabaseHelper {
           descricao TEXT,
           inicio TEXT,
           fim TEXT,
-          km_inicial REAL,
-          km_final REAL,
-          km_rodados REAL
+          km_inicial REAL CHECK(km_inicial >= 0),
+          km_final REAL CHECK(km_final >= 0),
+          km_rodados REAL CHECK(km_rodados >= 0)
         )
       ''');
 
@@ -72,7 +72,7 @@ class DatabaseHelper {
         CREATE TABLE ganhos (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           jornada_id INTEGER,
-          valor REAL,
+          valor REAL CHECK(valor >= 0),
           descricao TEXT,
           FOREIGN KEY (jornada_id) REFERENCES jornadas(id) ON DELETE CASCADE
         )
@@ -82,7 +82,7 @@ class DatabaseHelper {
         CREATE TABLE despesas (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           jornada_id INTEGER,
-          valor REAL,
+          valor REAL CHECK(valor >= 0),
           FOREIGN KEY (jornada_id) REFERENCES jornadas(id) ON DELETE CASCADE
         )
       ''');

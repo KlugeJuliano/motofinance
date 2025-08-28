@@ -1,19 +1,28 @@
 // ignore_for_file: unnecessary_const
 
 import 'package:flutter/material.dart';
+import 'package:motofinance/core/database/database_helper.dart';
 import 'package:motofinance/providers/despesa_provider.dart';
 import 'package:motofinance/providers/ganho_provider.dart';
 import 'package:motofinance/providers/jornada_provider.dart';
+import 'package:motofinance/repositories/jornada_repository.dart';
 import 'package:motofinance/screens/home_page.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 
-void main() {
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => JornadaProvider()),
-    ChangeNotifierProvider(create: (_) => GahnoProvider()),
-    ChangeNotifierProvider(create: (_) => DespesaProvider()),
-  ],
-  child: const MyApp(),
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final db = await DatabaseHelper.getDatabase();
+
+  runApp(MultiProvider(
+    providers: [
+      Provider<Database>(create: (_) => db),
+      ChangeNotifierProvider(create: (context) => JornadaProvider(JornadaRepository(db))),
+      ChangeNotifierProvider(create: (_) => GahnoProvider()),
+      ChangeNotifierProvider(create: (_) => DespesaProvider()),
+    ],
+    child: const MyApp(),
   ));
 }
 
@@ -27,7 +36,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MotoFinance',
       theme: ThemeData(
