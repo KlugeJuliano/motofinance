@@ -6,6 +6,7 @@ class SpendingPage extends StatefulWidget {
   const SpendingPage({super.key});
 
   @override
+
   State<SpendingPage> createState() => _SpendingPageState();
 }
 

@@ -1,11 +1,11 @@
-// ignore_for_file: unnecessary_const
-
 import 'package:flutter/material.dart';
 import 'package:motofinance/core/database/database_helper.dart';
 import 'package:motofinance/providers/despesa_provider.dart';
 import 'package:motofinance/providers/ganho_provider.dart';
 import 'package:motofinance/providers/jornada_provider.dart';
+import 'package:motofinance/providers/navigation_provider.dart';
 import 'package:motofinance/repositories/jornada_repository.dart';
+import 'package:motofinance/screens/dashboard_page.dart';
 import 'package:motofinance/screens/home_page.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +21,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => JornadaProvider(JornadaRepository(db))),
       ChangeNotifierProvider(create: (_) => GahnoProvider()),
       ChangeNotifierProvider(create: (_) => DespesaProvider()),
+      ChangeNotifierProvider(create: (context)=> NavigationProvider()),
     ],
     child: const MyApp(),
   ));
@@ -43,7 +44,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const HomePage(),
+      home: const DashboardPage(),
     );
   }
 }
