@@ -4,7 +4,7 @@ class Jornada {
   final DateTime? fim;
   final double kmInicial;
   final double? kmFinal;
-  final km_rodados;
+  final double? kmRodados;
 
   Jornada({
     this.id,
@@ -12,7 +12,7 @@ class Jornada {
     required this.fim,
     required this.kmInicial,
     this.kmFinal,
-    this.km_rodados,
+    this.kmRodados,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,7 +33,7 @@ class Jornada {
       kmInicial: (map['km_inicial'] as num).toDouble(),
       kmFinal:
           map['km_final'] != null ? (map['km_final'] as num).toDouble() : null,
-      km_rodados: map['km_rodados'] != null
+      kmRodados: map['km_rodados'] != null
           ? (map['km_rodados'] as num).toDouble()
           : null,
     );

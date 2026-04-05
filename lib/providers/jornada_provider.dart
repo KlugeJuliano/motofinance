@@ -11,6 +11,31 @@ class JornadaProvider with ChangeNotifier {
   List<Jornada> _jornadas = [];
 
   List<Jornada> get jornadas => _jornadas;
+  Jornada? get jornadaAberta {
+    for (final jornada in _jornadas) {
+      if (jornada.fim == null) {
+        return jornada;
+      }
+    }
+    return null;
+  }
+
+  Jornada? get jornadaAtualOuUltimaDoDia {
+    final aberta = jornadaAberta;
+    if (aberta != null) {
+      return aberta;
+    }
+
+    final now = DateTime.now();
+    for (final jornada in _jornadas) {
+      if (jornada.inicio.year == now.year &&
+          jornada.inicio.month == now.month &&
+          jornada.inicio.day == now.day) {
+        return jornada;
+      }
+    }
+    return null;
+  }
 
   Future<void> carregarJornadas() async {
     _jornadas = await repository.listarJornadas();
@@ -18,6 +43,9 @@ class JornadaProvider with ChangeNotifier {
   }
 
   Future<void> iniciarJornada(double kmInicial) async {
+    if (jornadaAberta != null) {
+      throw Exception('Ja existe uma jornada aberta');
+    }
     final jornada =
         Jornada(inicio: DateTime.now(), kmInicial: kmInicial, fim: null);
     await repository.inserirJornada(jornada);
