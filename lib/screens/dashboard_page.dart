@@ -7,6 +7,7 @@ import '../providers/navigation_provider.dart';
 import 'despesas_page.dart';
 import 'ganhos_page.dart';
 import 'jornada_page.dart';
+import 'relatorios_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key, this.loadData = true});
@@ -26,6 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
       JornadaPage(loadData: widget.loadData),
       GanhosPage(loadData: widget.loadData),
       SpendingPage(loadData: widget.loadData),
+      RelatoriosPage(loadData: widget.loadData),
     ];
     return Scaffold(
       backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
@@ -46,6 +48,8 @@ class _DashboardPageState extends State<DashboardPage> {
               icon: Icon(Icons.attach_money), label: 'Ganhos'),
           BottomNavigationBarItem(
               icon: Icon(Icons.money_off), label: 'Despesas'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart), label: 'Relatorios'),
         ],
         selectedItemColor: Colors.amber[800],
       ),

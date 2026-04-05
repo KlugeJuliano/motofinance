@@ -126,7 +126,11 @@ class _JornadaPageState extends State<JornadaPage> {
                   controller: kmController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   autofocus: true,
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                   decoration: _inputDecoration('Km inicial'),
                   validator: (value) {
                     final km = double.tryParse((value ?? '').replaceAll(',', '.'));
@@ -212,7 +216,11 @@ class _JornadaPageState extends State<JornadaPage> {
                   controller: kmController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   autofocus: true,
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                   decoration: _inputDecoration('Km final'),
                   validator: (value) {
                     final km = double.tryParse((value ?? '').replaceAll(',', '.'));
@@ -229,7 +237,11 @@ class _JornadaPageState extends State<JornadaPage> {
                 TextFormField(
                   controller: ganhoController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                   decoration: _inputDecoration('Ganho total do dia'),
                   validator: (value) {
                     final ganho = double.tryParse((value ?? '').replaceAll(',', '.'));
@@ -288,10 +300,34 @@ class _JornadaPageState extends State<JornadaPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: Colors.white10,
+      fillColor: Colors.white12,
+      labelStyle: const TextStyle(
+        color: Colors.white70,
+        fontWeight: FontWeight.w600,
+      ),
+      floatingLabelStyle: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w700,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.white24, width: 1.2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.lightBlueAccent, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: const BorderSide(color: Colors.white24),
       ),
     );
   }

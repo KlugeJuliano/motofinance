@@ -162,7 +162,11 @@ class _GanhosPageState extends State<GanhosPage> {
                 TextFormField(
                   controller: descricaoController,
                   autofocus: true,
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                   decoration: _inputDecoration('Descricao'),
                   validator: (value) {
                     if ((value ?? '').trim().length < 3) {
@@ -175,7 +179,11 @@ class _GanhosPageState extends State<GanhosPage> {
                 TextFormField(
                   controller: valorController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                   decoration: _inputDecoration('Valor'),
                   validator: (value) {
                     final valor = double.tryParse((value ?? '').replaceAll(',', '.'));
@@ -232,10 +240,34 @@ class _GanhosPageState extends State<GanhosPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: Colors.white10,
+      fillColor: Colors.white12,
+      labelStyle: const TextStyle(
+        color: Colors.white70,
+        fontWeight: FontWeight.w600,
+      ),
+      floatingLabelStyle: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w700,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.white24, width: 1.2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.greenAccent, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: const BorderSide(color: Colors.white24),
       ),
     );
   }
