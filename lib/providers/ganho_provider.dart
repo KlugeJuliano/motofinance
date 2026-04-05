@@ -1,39 +1,45 @@
 import 'package:flutter/material.dart';
 
 import '../models/ganho_model.dart';
+import '../repositories/ganho_repository.dart';
 
-class GahnoProvider with ChangeNotifier{
-  List<Ganho> _gahnos = [];
-  List<Ganho> get ganhos => _gahnos;
+class GanhoProvider with ChangeNotifier {
+  GanhoProvider(this.repository);
+
+  final GanhoRepository repository;
+
+  List<Ganho> _ganhos = [];
+  List<Ganho> get ganhos => _ganhos;
+  List<Ganho> get ganhosExtras =>
+      _ganhos.where((ganho) => ganho.tipo == 'extra').toList();
+  List<Ganho> get ganhosPrincipais =>
+      _ganhos.where((ganho) => ganho.tipo == 'principal').toList();
 
   Future<void> carregarGanhos() async {
-    // Simula o carregamento de dados
-    await Future.delayed(const Duration(seconds: 1));
-    _gahnos = [
-      Ganho(id: 1, descricao: 'Corrida 1', valor: 50.0,  jornadaId: 1),
-      Ganho(id: 2, descricao: 'Corrida 2', valor: 75.0,  jornadaId: 1),
-    ];
+    _ganhos = await repository.listarGanhos();
     notifyListeners();
   }
+
   Future<void> adicionarGanho(Ganho ganho) async {
-    // Simula a adição de um ganho
-    await Future.delayed(const Duration(seconds: 1));
-    _gahnos.add(ganho);
-    notifyListeners();
+    await repository.inserirGanho(ganho);
+    await carregarGanhos();
   }
+
   Future<void> removerGanho(int id) async {
-    // Simula a remoção de um ganho
-    await Future.delayed(const Duration(seconds: 1));
-    _gahnos.removeWhere((ganho) => ganho.id == id);
-    notifyListeners();
+    await repository.excluirGanho(id);
+    await carregarGanhos();
   }
+
   Future<void> atualizarGanho(Ganho ganho) async {
-    // Simula a atualização de um ganho
-    await Future.delayed(const Duration(seconds: 1));
-    final index = _gahnos.indexWhere((g) => g.id == ganho.id);
-    if (index != -1) {
-      _gahnos[index] = ganho;
-      notifyListeners();
-    }
+    await repository.editarGanho(ganho);
+    await carregarGanhos();
+  }
+
+  Future<void> salvarGanhoPrincipal({
+    required int jornadaId,
+    required double valor,
+  }) async {
+    await repository.salvarGanhoPrincipal(jornadaId: jornadaId, valor: valor);
+    await carregarGanhos();
   }
 }
