@@ -296,11 +296,24 @@ class _GanhoTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white10,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white12),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Text(ganho.descricao),
-        subtitle: const Text('Segure para excluir'),
+        title: Text(
+          ganho.descricao,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        subtitle: const Text(
+          'Segure para excluir',
+          style: TextStyle(
+            color: Colors.white70,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         trailing: Text(
           currency.format(ganho.valor),
           style: const TextStyle(

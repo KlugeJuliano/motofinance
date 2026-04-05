@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // Exceção personalizada para erros do banco de dados
@@ -28,16 +29,11 @@ class DatabaseHelper {
   /// Abre uma conexão com o banco de dados, em memória ou em arquivo.
   static Future<Database> getDatabase({bool inMemory = true}) async {
     try {
-      // Initialize FFI if running on Desktop platforms
-      if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-        sqfliteFfiInit();
-        databaseFactory = databaseFactoryFfi;
-      }
+      final factory = _databaseFactory;
 
       if (inMemory) {
-        // For in-memory, we don't cache in _database to allow fresh instances in tests
-        // unless specifically needed.
-        final db = await databaseFactoryFfi.openDatabase(
+        // Em testes, cada chamada em memoria deve retornar uma instancia isolada.
+        final db = await factory.openDatabase(
           inMemoryDatabasePath,
           options: OpenDatabaseOptions(
             version: _databaseVersion,
@@ -51,25 +47,35 @@ class DatabaseHelper {
         );
         return db;
       }
-      _database = await openDatabase(
+      _database = await factory.openDatabase(
         join(await getDatabasesPath(), _databaseName),
-        version: _databaseVersion,
-        onCreate: (db, version) async {
-          await _createTables(db);
-        },
-        onConfigure: (db) async {
-          await db.execute('PRAGMA foreign_keys = ON;');
-        },
-        onUpgrade: (db, oldVersion, newVersion) async {
-          if (oldVersion < 2) {
-            await _migrateToV2(db);
-          }
-        },
+        options: OpenDatabaseOptions(
+          version: _databaseVersion,
+          onCreate: (db, version) async {
+            await _createTables(db);
+          },
+          onConfigure: (db) async {
+            await db.execute('PRAGMA foreign_keys = ON;');
+          },
+          onUpgrade: (db, oldVersion, newVersion) async {
+            if (oldVersion < 2) {
+              await _migrateToV2(db);
+            }
+          },
+        ),
       );
       return _database!;
     } catch (e) {
       throw DatabaseHelperException('Erro ao abrir o banco de dados: $e');
     }
+  }
+
+  static DatabaseFactory get _databaseFactory {
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      sqfliteFfiInit();
+      return databaseFactoryFfi;
+    }
+    return databaseFactory;
   }
 
   /// Fecha a conexão com o banco de dados.
@@ -120,7 +126,9 @@ class DatabaseHelper {
 
   static Future<void> _migrateToV2(Database db) async {
     final despesasSchema = await db.rawQuery('PRAGMA table_info(despesas)');
-    final hasCategoria = despesasSchema.any((column) => column['name'] == 'categoria');
+    final hasCategoria = despesasSchema.any(
+      (column) => column['name'] == 'categoria',
+    );
     if (!hasCategoria) {
       await db.execute('ALTER TABLE despesas ADD COLUMN categoria TEXT');
     }
@@ -128,7 +136,9 @@ class DatabaseHelper {
     final ganhosSchema = await db.rawQuery('PRAGMA table_info(ganhos)');
     final hasTipo = ganhosSchema.any((column) => column['name'] == 'tipo');
     if (!hasTipo) {
-      await db.execute("ALTER TABLE ganhos ADD COLUMN tipo TEXT NOT NULL DEFAULT 'extra'");
+      await db.execute(
+        "ALTER TABLE ganhos ADD COLUMN tipo TEXT NOT NULL DEFAULT 'extra'",
+      );
     }
   }
 }

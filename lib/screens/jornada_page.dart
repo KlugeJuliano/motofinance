@@ -404,6 +404,7 @@ class _JornadaTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white10,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white12),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -411,11 +412,19 @@ class _JornadaTile extends StatelessWidget {
           jornada.fim == null
               ? 'Jornada em andamento'
               : 'Jornada encerrada',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         subtitle: Text(
           jornada.fim == null
               ? 'Inicio ${timeFormat.format(jornada.inicio)}  |  Km ${jornada.kmInicial.toStringAsFixed(1)}'
               : 'Inicio ${timeFormat.format(jornada.inicio)}  |  ${jornada.kmRodados?.toStringAsFixed(1) ?? '0.0'} km',
+          style: const TextStyle(
+            color: Colors.white70,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         trailing: onFinish == null
             ? const Icon(Icons.check_circle, color: Colors.greenAccent)

@@ -248,6 +248,9 @@ class _PeriodoSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final chipBackground = const Color(0xFF1A1F2B);
+    final chipSelected = const Color(0xFF8BE9FD);
+
     return Row(
       children: [
         Expanded(
@@ -255,11 +258,20 @@ class _PeriodoSwitcher extends StatelessWidget {
             label: const Text('Semana'),
             selected: periodo == _PeriodoRelatorio.semana,
             onSelected: (_) => onChanged(_PeriodoRelatorio.semana),
-            selectedColor: Colors.lightBlueAccent,
+            backgroundColor: chipBackground,
+            selectedColor: chipSelected,
+            side: BorderSide(
+              color: periodo == _PeriodoRelatorio.semana
+                  ? chipSelected
+                  : Colors.white24,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
             labelStyle: TextStyle(
               color: periodo == _PeriodoRelatorio.semana
                   ? Colors.black
-                  : Colors.white,
+                  : Colors.white70,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -270,10 +282,19 @@ class _PeriodoSwitcher extends StatelessWidget {
             label: const Text('Mes'),
             selected: periodo == _PeriodoRelatorio.mes,
             onSelected: (_) => onChanged(_PeriodoRelatorio.mes),
-            selectedColor: Colors.lightBlueAccent,
+            backgroundColor: chipBackground,
+            selectedColor: chipSelected,
+            side: BorderSide(
+              color: periodo == _PeriodoRelatorio.mes
+                  ? chipSelected
+                  : Colors.white24,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
             labelStyle: TextStyle(
               color:
-                  periodo == _PeriodoRelatorio.mes ? Colors.black : Colors.white,
+                  periodo == _PeriodoRelatorio.mes ? Colors.black : Colors.white70,
               fontWeight: FontWeight.w700,
             ),
           ),
