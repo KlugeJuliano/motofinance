@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // Exceção personalizada para erros do banco de dados
@@ -19,36 +19,53 @@ class DatabaseHelper {
 
   static Database? _database;
 
-  /// Singleton pattern to ensure only one connection is active.
+  /// Completer usado para evitar inicialização concorrente do banco.
+  static Completer<Database>? _completer;
+
+  /// Singleton seguro contra acesso concorrente.
+  /// Retorna a instância existente ou aguarda a inicialização em andamento.
   static Future<Database> get instance async {
     if (_database != null) return _database!;
-    _database = await getDatabase(inMemory: false);
+
+    if (_completer != null) return _completer!.future;
+
+    _completer = Completer<Database>();
+    try {
+      final db = await _openDatabase();
+      _database = db;
+      _completer!.complete(db);
+    } catch (e) {
+      _completer!.completeError(e);
+      _completer = null;
+      rethrow;
+    }
     return _database!;
   }
 
-  /// Abre uma conexão com o banco de dados, em memória ou em arquivo.
-  static Future<Database> getDatabase({bool inMemory = true}) async {
+  /// API explícita para testes e integrações locais.
+  static Future<Database> getDatabase({
+    bool inMemory = false,
+    String? pathOverride,
+  }) async {
+    if (inMemory) {
+      return openInMemoryDatabase();
+    }
+
+    if (pathOverride != null) {
+      return _openDatabase(pathOverride: pathOverride);
+    }
+
+    return instance;
+  }
+
+  /// Abre o banco de dados em arquivo (produção).
+  static Future<Database> _openDatabase({String? pathOverride}) async {
     try {
       final factory = _databaseFactory;
+      final path = pathOverride ?? join(await getDatabasesPath(), _databaseName);
 
-      if (inMemory) {
-        // Em testes, cada chamada em memoria deve retornar uma instancia isolada.
-        final db = await factory.openDatabase(
-          inMemoryDatabasePath,
-          options: OpenDatabaseOptions(
-            version: _databaseVersion,
-            onCreate: (db, version) async {
-              await _createTables(db);
-            },
-            onConfigure: (db) async {
-              await db.execute('PRAGMA foreign_keys = ON;');
-            },
-          ),
-        );
-        return db;
-      }
-      _database = await factory.openDatabase(
-        join(await getDatabasesPath(), _databaseName),
+      return await factory.openDatabase(
+        path,
         options: OpenDatabaseOptions(
           version: _databaseVersion,
           onCreate: (db, version) async {
@@ -64,12 +81,34 @@ class DatabaseHelper {
           },
         ),
       );
-      return _database!;
     } catch (e) {
       throw DatabaseHelperException('Erro ao abrir o banco de dados: $e');
     }
   }
 
+  /// Abre um banco de dados em memória isolado — ideal para testes.
+  static Future<Database> openInMemoryDatabase() async {
+    try {
+      final factory = _databaseFactory;
+      return await factory.openDatabase(
+        inMemoryDatabasePath,
+        options: OpenDatabaseOptions(
+          version: _databaseVersion,
+          onCreate: (db, version) async {
+            await _createTables(db);
+          },
+          onConfigure: (db) async {
+            await db.execute('PRAGMA foreign_keys = ON;');
+          },
+        ),
+      );
+    } catch (e) {
+      throw DatabaseHelperException(
+          'Erro ao abrir banco de dados em memória: $e');
+    }
+  }
+
+  /// Retorna a factory correta dependendo da plataforma.
   static DatabaseFactory get _databaseFactory {
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       sqfliteFfiInit();
@@ -78,10 +117,16 @@ class DatabaseHelper {
     return databaseFactory;
   }
 
-  /// Fecha a conexão com o banco de dados.
+  /// Fecha a conexão com o banco de dados e reseta o estado interno.
   static Future<void> close() async {
-    await _database?.close();
+    final db = _database;
     _database = null;
+    _completer = null;
+    await db?.close();
+  }
+
+  static Future<String> getDatabasePath() async {
+    return join(await getDatabasesPath(), _databaseName);
   }
 
   /// Cria as tabelas do banco de dados: jornadas, ganhos e despesas.
@@ -124,11 +169,11 @@ class DatabaseHelper {
     }
   }
 
+  /// Migração da versão 1 para a versão 2 do esquema.
   static Future<void> _migrateToV2(Database db) async {
     final despesasSchema = await db.rawQuery('PRAGMA table_info(despesas)');
-    final hasCategoria = despesasSchema.any(
-      (column) => column['name'] == 'categoria',
-    );
+    final hasCategoria =
+        despesasSchema.any((column) => column['name'] == 'categoria');
     if (!hasCategoria) {
       await db.execute('ALTER TABLE despesas ADD COLUMN categoria TEXT');
     }

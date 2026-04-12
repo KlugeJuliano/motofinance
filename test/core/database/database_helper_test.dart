@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:motofinance/core/database/database_helper.dart';
 
@@ -121,6 +122,40 @@ void main() {
         }),
         throwsA(isA<DatabaseException>()),
       );
+    });
+
+    test("deve persistir dados ao fechar e abrir novamente o banco", () async {
+      final baseDir = await getDatabasesPath();
+      final path = join(baseDir, 'motofinance_persist_test.db');
+
+      await deleteDatabase(path);
+
+      final firstDb = await DatabaseHelper.getDatabase(pathOverride: path);
+      final jornadaId = await firstDb.insert("jornadas", {
+        "inicio": DateTime(2025, 1, 1, 8, 0).toIso8601String(),
+        "fim": DateTime(2025, 1, 1, 18, 0).toIso8601String(),
+        "km_inicial": 1000.0,
+        "km_final": 1100.0,
+        "km_rodados": 100.0,
+      });
+      await firstDb.insert("ganhos", {
+        "jornada_id": jornadaId,
+        "valor": 150.0,
+        "descricao": "Persistencia",
+        "tipo": "principal",
+      });
+      await firstDb.close();
+
+      final reopenedDb = await DatabaseHelper.getDatabase(pathOverride: path);
+      final jornadas = await reopenedDb.query("jornadas");
+      final ganhos = await reopenedDb.query("ganhos");
+
+      expect(jornadas, hasLength(1));
+      expect(ganhos, hasLength(1));
+      expect((ganhos.first["valor"] as num).toDouble(), 150.0);
+
+      await reopenedDb.close();
+      await deleteDatabase(path);
     });
   });
 }
