@@ -33,4 +33,12 @@ class JornadaRepository {
       whereArgs: [id],
     );
   }
+
+  Future<void> limparBanco() async {
+    await db.transaction((txn) async {
+      await txn.delete('ganhos');
+      await txn.delete('despesas');
+      await txn.delete('jornadas');
+    });
+  }
 }

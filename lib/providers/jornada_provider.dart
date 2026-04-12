@@ -56,4 +56,10 @@ class JornadaProvider with ChangeNotifier {
     await repository.finalizar(id, kmFinal);
     await carregarJornadas();
   }
+
+  Future<void> limparBanco() async {
+    await repository.limparBanco();
+    _jornadas = [];
+    notifyListeners();
+  }
 }

@@ -56,6 +56,13 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
       appBar: AppBar(
         title: const Text('Relatorios'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: 'Zerar dados',
+            onPressed: () => _confirmarLimpeza(context),
+            icon: const Icon(Icons.delete_sweep),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -165,6 +172,56 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
     final formatter = DateFormat('dd/MM');
     final end = intervalo.end.subtract(const Duration(days: 1));
     return '${formatter.format(intervalo.start)} a ${formatter.format(end)}';
+  }
+
+  Future<void> _confirmarLimpeza(BuildContext context) async {
+    final jornadaProvider = context.read<JornadaProvider>();
+    final ganhoProvider = context.read<GanhoProvider>();
+    final despesaProvider = context.read<DespesaProvider>();
+    final confirmado = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF111111),
+          title: const Text('Zerar dados do app?'),
+          content: const Text(
+            'Essa acao apaga jornadas, ganhos e despesas salvos no aparelho. Essa operacao nao pode ser desfeita.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Apagar tudo'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmado != true || !context.mounted) {
+      return;
+    }
+
+    await jornadaProvider.limparBanco();
+    await ganhoProvider.carregarGanhos();
+    await despesaProvider.carregarDespesas();
+
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Todos os dados foram removidos do banco local.'),
+      ),
+    );
   }
 }
 

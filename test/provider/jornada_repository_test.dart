@@ -60,6 +60,30 @@ void main() {
       expect(result.first['km_final'], 1100.0);
     });
 
+    test('deve limpar todas as tabelas do banco', () async {
+      final jornadaId = await db.insert('jornadas', {
+        "inicio": DateTime(2025, 1, 1, 8, 0).toIso8601String(),
+        "km_inicial": 1000.0,
+      });
+      await db.insert('ganhos', {
+        'jornada_id': jornadaId,
+        'valor': 100.0,
+        'descricao': 'Teste',
+        'tipo': 'principal',
+      });
+      await db.insert('despesas', {
+        'jornada_id': jornadaId,
+        'valor': 25.0,
+        'categoria': 'Combustivel',
+      });
+
+      await jornadaRepository.limparBanco();
+
+      expect(await db.query('jornadas'), isEmpty);
+      expect(await db.query('ganhos'), isEmpty);
+      expect(await db.query('despesas'), isEmpty);
+    });
+
 /*  test('deve lançar erro ao finalizar jornada inexistente', ()async{
 
     expect(
