@@ -163,4 +163,4 @@ flutter run
 ## Author
 
 **Juliano**
-[GitHub](https://github.com/your-username) · [LinkedIn](https://linkedin.com/in/your-profile)
+[GitHub](https://github.com/Destroier1945) · [LinkedIn](https://www.linkedin.com/in/juliano-kluge/)
