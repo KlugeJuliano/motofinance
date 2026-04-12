@@ -36,6 +36,9 @@ class FakeJornadaProvider extends ChangeNotifier implements JornadaProvider {
 
   @override
   Future<void> finalizarJornada(int id, double kmFinal) async {}
+
+  @override
+  Future<void> limparBanco() async {}
 }
 
 class FakeGanhoProvider extends ChangeNotifier implements GanhoProvider {
