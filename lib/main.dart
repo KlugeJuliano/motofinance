@@ -11,10 +11,18 @@ import 'package:motofinance/screens/dashboard_page.dart';
 import 'package:motofinance/themes/custom_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   final db = await DatabaseHelper.instance;
+
+  FlutterNativeSplash.remove();
 
   runApp(MultiProvider(
     providers: [
