@@ -36,11 +36,9 @@ class _GanhosPageState extends State<GanhosPage> {
   @override
   Widget build(BuildContext context) {
     final jornadaProvider = context.watch<JornadaProvider>();
-    final ganhosExtras = context.watch<GanhoProvider>().ganhosExtras;
-    final totalExtras = ganhosExtras.fold<double>(
-      0,
-      (total, ganho) => total + ganho.valor,
-    );
+    final ganhoProvider = context.watch<GanhoProvider>();
+    final ganhosExtras = ganhoProvider.ganhosExtras;
+    final totalExtras = ganhoProvider.totalGanhosExtras;
 
     return Scaffold(
       backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,

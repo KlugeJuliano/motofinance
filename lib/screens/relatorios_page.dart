@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:motofinance/models/despesa_model.dart';
-import 'package:motofinance/models/ganho_model.dart';
-import 'package:motofinance/models/jornada_model.dart';
 import 'package:motofinance/providers/despesa_provider.dart';
 import 'package:motofinance/providers/ganho_provider.dart';
 import 'package:motofinance/providers/jornada_provider.dart';
+import 'package:motofinance/services/finance_metrics_service.dart';
 import 'package:motofinance/themes/custom_theme.dart';
 import 'package:provider/provider.dart';
-
-enum _PeriodoRelatorio { semana, mes }
 
 class RelatoriosPage extends StatefulWidget {
   const RelatoriosPage({super.key, this.loadData = true});
@@ -24,7 +20,8 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
   final NumberFormat _currency =
       NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$ ');
   final DateFormat _dayFormat = DateFormat('dd/MM');
-  _PeriodoRelatorio _periodo = _PeriodoRelatorio.semana;
+  final FinanceMetricsService _metricsService = const FinanceMetricsService();
+  ReportPeriod _periodo = ReportPeriod.semana;
 
   @override
   void initState() {
@@ -47,24 +44,12 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
     final jornadas = context.watch<JornadaProvider>().jornadas;
     final ganhos = context.watch<GanhoProvider>().ganhos;
     final despesas = context.watch<DespesaProvider>().despesas;
-
-    final intervalo = _intervaloAtual();
-    final jornadasPeriodo = jornadas.where(
-      (jornada) =>
-          !jornada.inicio.isBefore(intervalo.start) &&
-          jornada.inicio.isBefore(intervalo.end),
+    final report = _metricsService.buildReportSummary(
+      period: _periodo,
+      jornadas: jornadas,
+      ganhos: ganhos,
+      despesas: despesas,
     );
-    final detalhes = _buildDetalhes(
-      jornadasPeriodo.toList(),
-      ganhos,
-      despesas,
-    );
-    final totalKm = detalhes.fold<double>(0, (sum, item) => sum + item.km);
-    final totalHoras = detalhes.fold<double>(0, (sum, item) => sum + item.horas);
-    final totalGanhos =
-        detalhes.fold<double>(0, (sum, item) => sum + item.ganhos);
-    final totalDespesas =
-        detalhes.fold<double>(0, (sum, item) => sum + item.despesas);
 
     return Scaffold(
       backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
@@ -94,7 +79,7 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _periodo == _PeriodoRelatorio.semana
+                  _periodo == ReportPeriod.semana
                       ? 'Resumo da semana'
                       : 'Resumo do mes',
                   style: const TextStyle(
@@ -105,7 +90,7 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _tituloIntervalo(intervalo),
+                  _tituloIntervalo(report.interval),
                   style: const TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.w700,
@@ -117,14 +102,14 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
                     Expanded(
                       child: _ResumoMiniCard(
                         title: 'Km',
-                        value: totalKm.toStringAsFixed(1),
+                        value: report.totalKm.toStringAsFixed(1),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: _ResumoMiniCard(
                         title: 'Horas',
-                        value: totalHoras.toStringAsFixed(1),
+                        value: report.totalHours.toStringAsFixed(1),
                       ),
                     ),
                   ],
@@ -135,14 +120,14 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
                     Expanded(
                       child: _ResumoMiniCard(
                         title: 'Ganhos',
-                        value: _currency.format(totalGanhos),
+                        value: _currency.format(report.totalGains),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: _ResumoMiniCard(
                         title: 'Despesas',
-                        value: _currency.format(totalDespesas),
+                        value: _currency.format(report.totalExpenses),
                       ),
                     ),
                   ],
@@ -156,18 +141,18 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
             style: CustomTheme.darkTheme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
-          if (detalhes.isEmpty)
+          if (report.details.isEmpty)
             const _RelatorioVazio()
           else
-            ...detalhes.map(
+            ...report.details.map(
                   (item) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _DetalheCard(
-                      label: _dayFormat.format(item.dia),
-                      ganhos: _currency.format(item.ganhos),
-                      despesas: _currency.format(item.despesas),
+                      label: _dayFormat.format(item.day),
+                      ganhos: _currency.format(item.gains),
+                      despesas: _currency.format(item.expenses),
                       km: '${item.km.toStringAsFixed(1)} km',
-                      horas: '${item.horas.toStringAsFixed(1)} h',
+                      horas: '${item.hours.toStringAsFixed(1)} h',
                     ),
                   ),
                 ),
@@ -176,64 +161,10 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
     );
   }
 
-  DateTimeRange _intervaloAtual() {
-    final now = DateTime.now();
-    if (_periodo == _PeriodoRelatorio.mes) {
-      final start = DateTime(now.year, now.month);
-      final end = DateTime(now.year, now.month + 1);
-      return DateTimeRange(start: start, end: end);
-    }
-
-    final start = DateTime(now.year, now.month, now.day)
-        .subtract(Duration(days: now.weekday - 1));
-    final end = start.add(const Duration(days: 7));
-    return DateTimeRange(start: start, end: end);
-  }
-
-  String _tituloIntervalo(DateTimeRange intervalo) {
+  String _tituloIntervalo(DateInterval intervalo) {
     final formatter = DateFormat('dd/MM');
     final end = intervalo.end.subtract(const Duration(days: 1));
     return '${formatter.format(intervalo.start)} a ${formatter.format(end)}';
-  }
-
-  List<_DetalheRelatorio> _buildDetalhes(
-    List<Jornada> jornadasPeriodo,
-    List<Ganho> ganhos,
-    List<Despesa> despesas,
-  ) {
-    final Map<DateTime, _DetalheRelatorio> detalhes = {};
-
-    for (final jornada in jornadasPeriodo) {
-      final dia = DateTime(
-        jornada.inicio.year,
-        jornada.inicio.month,
-        jornada.inicio.day,
-      );
-      final detalhe = detalhes.putIfAbsent(
-        dia,
-        () => _DetalheRelatorio(dia: dia),
-      );
-
-      final fim = jornada.fim ?? DateTime.now();
-      final horas = fim.difference(jornada.inicio).inMinutes / 60;
-      detalhe.km += jornada.kmRodados ?? 0;
-      detalhe._inicios.add(jornada.inicio);
-      detalhe._fins.add(fim);
-
-      final jornadaGanhos = ganhos.where((ganho) => ganho.jornadaId == jornada.id);
-      final jornadaDespesas =
-          despesas.where((despesa) => despesa.jornadaId == jornada.id);
-
-      detalhe.ganhos +=
-          jornadaGanhos.fold<double>(0, (sum, ganho) => sum + ganho.valor);
-      detalhe.despesas +=
-          jornadaDespesas.fold<double>(0, (sum, despesa) => sum + despesa.valor);
-      detalhe.horas = horas > 0 ? detalhe._calcularHorasJanela() : detalhe.horas;
-    }
-
-    final lista = detalhes.values.toList()
-      ..sort((a, b) => b.dia.compareTo(a.dia));
-    return lista;
   }
 }
 
@@ -243,8 +174,8 @@ class _PeriodoSwitcher extends StatelessWidget {
     required this.onChanged,
   });
 
-  final _PeriodoRelatorio periodo;
-  final ValueChanged<_PeriodoRelatorio> onChanged;
+  final ReportPeriod periodo;
+  final ValueChanged<ReportPeriod> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -256,12 +187,12 @@ class _PeriodoSwitcher extends StatelessWidget {
         Expanded(
           child: ChoiceChip(
             label: const Text('Semana'),
-            selected: periodo == _PeriodoRelatorio.semana,
-            onSelected: (_) => onChanged(_PeriodoRelatorio.semana),
+            selected: periodo == ReportPeriod.semana,
+            onSelected: (_) => onChanged(ReportPeriod.semana),
             backgroundColor: chipBackground,
             selectedColor: chipSelected,
             side: BorderSide(
-              color: periodo == _PeriodoRelatorio.semana
+              color: periodo == ReportPeriod.semana
                   ? chipSelected
                   : Colors.white24,
             ),
@@ -269,7 +200,7 @@ class _PeriodoSwitcher extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
             ),
             labelStyle: TextStyle(
-              color: periodo == _PeriodoRelatorio.semana
+              color: periodo == ReportPeriod.semana
                   ? Colors.black
                   : Colors.white70,
               fontWeight: FontWeight.w700,
@@ -280,12 +211,12 @@ class _PeriodoSwitcher extends StatelessWidget {
         Expanded(
           child: ChoiceChip(
             label: const Text('Mes'),
-            selected: periodo == _PeriodoRelatorio.mes,
-            onSelected: (_) => onChanged(_PeriodoRelatorio.mes),
+            selected: periodo == ReportPeriod.mes,
+            onSelected: (_) => onChanged(ReportPeriod.mes),
             backgroundColor: chipBackground,
             selectedColor: chipSelected,
             side: BorderSide(
-              color: periodo == _PeriodoRelatorio.mes
+              color: periodo == ReportPeriod.mes
                   ? chipSelected
                   : Colors.white24,
             ),
@@ -294,7 +225,7 @@ class _PeriodoSwitcher extends StatelessWidget {
             ),
             labelStyle: TextStyle(
               color:
-                  periodo == _PeriodoRelatorio.mes ? Colors.black : Colors.white70,
+                  periodo == ReportPeriod.mes ? Colors.black : Colors.white70,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -457,27 +388,5 @@ class _RelatorioVazio extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _DetalheRelatorio {
-  _DetalheRelatorio({required this.dia});
-
-  final DateTime dia;
-  double km = 0;
-  double horas = 0;
-  double ganhos = 0;
-  double despesas = 0;
-  final List<DateTime> _inicios = [];
-  final List<DateTime> _fins = [];
-
-  double _calcularHorasJanela() {
-    if (_inicios.isEmpty || _fins.isEmpty) {
-      return 0;
-    }
-    final inicio = _inicios.reduce((a, b) => a.isBefore(b) ? a : b);
-    final fim = _fins.reduce((a, b) => a.isAfter(b) ? a : b);
-    final duration = fim.difference(inicio).inMinutes / 60;
-    return duration.isNegative ? 0 : duration;
   }
 }

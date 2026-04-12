@@ -14,6 +14,8 @@ class GanhoProvider with ChangeNotifier {
       _ganhos.where((ganho) => ganho.tipo == 'extra').toList();
   List<Ganho> get ganhosPrincipais =>
       _ganhos.where((ganho) => ganho.tipo == 'principal').toList();
+  double get totalGanhosExtras =>
+      ganhosExtras.fold<double>(0, (total, ganho) => total + ganho.valor);
 
   Future<void> carregarGanhos() async {
     _ganhos = await repository.listarGanhos();

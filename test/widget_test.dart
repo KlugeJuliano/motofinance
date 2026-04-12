@@ -56,6 +56,10 @@ class FakeGanhoProvider extends ChangeNotifier implements GanhoProvider {
       ganhos.where((ganho) => ganho.tipo == 'principal').toList();
 
   @override
+  double get totalGanhosExtras =>
+      ganhosExtras.fold<double>(0, (total, ganho) => total + ganho.valor);
+
+  @override
   Future<void> carregarGanhos() async {}
 
   @override
@@ -82,6 +86,10 @@ class FakeDespesaProvider extends ChangeNotifier implements DespesaProvider {
 
   @override
   DespesaRepository get repository => throw UnimplementedError();
+
+  @override
+  double get totalDespesas =>
+      despesas.fold<double>(0, (total, despesa) => total + despesa.valor);
 
   @override
   Future<void> carregarDespesas() async {}

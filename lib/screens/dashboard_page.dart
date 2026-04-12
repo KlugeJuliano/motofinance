@@ -38,6 +38,8 @@ class _DashboardPageState extends State<DashboardPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigation.currentIndex,
         onTap: (index) => navigation.setCurrentIndex(index),
+        backgroundColor: Colors.black,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
@@ -52,6 +54,9 @@ class _DashboardPageState extends State<DashboardPage> {
               icon: Icon(Icons.bar_chart), label: 'Relatorios'),
         ],
         selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.white70,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
       ),
     );
   }

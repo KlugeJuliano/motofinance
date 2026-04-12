@@ -8,12 +8,13 @@ import 'package:motofinance/repositories/despesa_repository.dart';
 import 'package:motofinance/repositories/ganho_repository.dart';
 import 'package:motofinance/repositories/jornada_repository.dart';
 import 'package:motofinance/screens/dashboard_page.dart';
+import 'package:motofinance/themes/custom_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final db = await DatabaseHelper.getDatabase();
+  final db = await DatabaseHelper.instance;
 
   runApp(MultiProvider(
     providers: [
@@ -49,10 +50,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MotoFinance',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: CustomTheme.darkTheme,
       home: const DashboardPage(),
     );
   }

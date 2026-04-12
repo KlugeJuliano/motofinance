@@ -23,7 +23,7 @@ class Despesa {
   factory Despesa.fromMap(Map<String, dynamic> map) {
     return Despesa(
       id: map['id'],
-      jornadaId: map['jornada_id'] ?? map['jornalId'],
+      jornadaId: map['jornada_id'] ?? map['jornadaId'],
       valor: (map['valor'] as num).toDouble(),
       categoria: map['categoria'],
     );

@@ -36,11 +36,9 @@ class _SpendingPageState extends State<SpendingPage> {
   @override
   Widget build(BuildContext context) {
     final jornadaProvider = context.watch<JornadaProvider>();
-    final despesas = context.watch<DespesaProvider>().despesas;
-    final totalDespesas = despesas.fold<double>(
-      0,
-      (total, despesa) => total + despesa.valor,
-    );
+    final despesaProvider = context.watch<DespesaProvider>();
+    final despesas = despesaProvider.despesas;
+    final totalDespesas = despesaProvider.totalDespesas;
 
     return Scaffold(
       backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,

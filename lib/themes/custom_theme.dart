@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
 
 class CustomTheme {
-   static ThemeData get darkTheme {
+  static ThemeData get darkTheme {
     return ThemeData(
-      primarySwatch: Colors.blueGrey,
+      useMaterial3: true,
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.lightBlueAccent,
+        secondary: Colors.amber,
+        surface: Color(0xFF000000),
+      ),
       brightness: Brightness.dark,
       scaffoldBackgroundColor: Colors.black,
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.black12,
-        foregroundColor: Colors.black12,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
       ),
-      textTheme: TextTheme(
-        bodyMedium: TextStyle(color: Colors.white, fontSize: 24, fontFamily: 'Roboto'),
-        bodyLarge: TextStyle(color: Colors.white70, fontSize: 28, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
+      textTheme: const TextTheme(
+        bodyMedium: TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontFamily: 'Roboto',
+        ),
+        bodyLarge: TextStyle(
+          color: Colors.white70,
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Roboto',
+        ),
       ),
-      buttonTheme: ButtonThemeData(
+      buttonTheme: const ButtonThemeData(
         buttonColor: Colors.blueGrey,
         textTheme: ButtonTextTheme.primary,
       ),

@@ -10,6 +10,8 @@ class DespesaProvider with ChangeNotifier {
 
   List<Despesa> _despesas = [];
   List<Despesa> get despesas => _despesas;
+  double get totalDespesas =>
+      _despesas.fold<double>(0, (total, despesa) => total + despesa.valor);
 
   Future<void> carregarDespesas() async {
     _despesas = await repository.listarDespesas();

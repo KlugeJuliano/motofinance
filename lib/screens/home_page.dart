@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:motofinance/models/jornada_model.dart';
 import 'package:motofinance/providers/despesa_provider.dart';
 import 'package:motofinance/providers/ganho_provider.dart';
 import 'package:motofinance/providers/jornada_provider.dart';
+import 'package:motofinance/services/finance_metrics_service.dart';
 import 'package:motofinance/themes/custom_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final NumberFormat _currency =
       NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$ ');
+  final FinanceMetricsService _metricsService = const FinanceMetricsService();
 
   @override
   void initState() {
@@ -41,36 +42,11 @@ class _HomePageState extends State<HomePage> {
     final jornadas = context.watch<JornadaProvider>().jornadas;
     final ganhos = context.watch<GanhoProvider>().ganhos;
     final despesas = context.watch<DespesaProvider>().despesas;
-    final jornadasHoje = _jornadasDoDia(jornadas).toList();
-    final jornadaIdsHoje =
-        jornadasHoje.map((jornada) => jornada.id).whereType<int>().toSet();
-    final kmRodadosHoje = jornadasHoje.fold<double>(
-      0,
-      (total, jornada) => total + (jornada.kmRodados ?? 0),
+    final summary = _metricsService.buildDashboardSummary(
+      jornadas: jornadas,
+      ganhos: ganhos,
+      despesas: despesas,
     );
-    final ganhosPrincipaisHoje = ganhos
-        .where(
-          (ganho) =>
-              ganho.tipo == 'principal' &&
-              jornadaIdsHoje.contains(ganho.jornadaId),
-        )
-        .fold<double>(0, (total, ganho) => total + ganho.valor);
-    final ganhosExtrasHoje = ganhos
-        .where(
-          (ganho) =>
-              ganho.tipo == 'extra' && jornadaIdsHoje.contains(ganho.jornadaId),
-        )
-        .fold<double>(0, (total, ganho) => total + ganho.valor);
-    final ganhosHoje = ganhosPrincipaisHoje + ganhosExtrasHoje;
-    final despesasHoje = despesas
-        .where((despesa) => jornadaIdsHoje.contains(despesa.jornadaId))
-        .fold<double>(0, (total, despesa) => total + despesa.valor);
-    final saldoHoje = ganhosHoje - despesasHoje;
-    final jornadaAberta = context.watch<JornadaProvider>().jornadaAberta;
-    final horasTrabalhadasHoje = _horasTrabalhadas(jornadasHoje);
-    final ganhoPorKm = kmRodadosHoje > 0 ? saldoHoje / kmRodadosHoje : 0.0;
-    final ganhoPorHora =
-        horasTrabalhadasHoje > 0 ? saldoHoje / horasTrabalhadasHoje : 0.0;
 
     return Scaffold(
       backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
@@ -82,7 +58,7 @@ class _HomePageState extends State<HomePage> {
               style: CustomTheme.darkTheme.textTheme.bodyMedium,
             ),
             Text(
-              DateFormat('dd/MM/yyyy').format(DateTime.now()),
+              DateFormat('dd/MM/yyyy').format(summary.referenceDate),
               style: const TextStyle(fontSize: 16, color: Colors.white70),
             ),
           ],
@@ -128,9 +104,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        jornadaAberta == null
+                        summary.jornadaAberta == null
                             ? 'Sem jornada aberta neste momento'
-                            : 'Jornada aberta desde ${DateFormat('HH:mm').format(jornadaAberta.inicio)}',
+                            : 'Jornada aberta desde ${DateFormat('HH:mm').format(summary.jornadaAberta!.inicio)}',
                         style: const TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.w600,
@@ -138,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        '${kmRodadosHoje.toStringAsFixed(1)} km rodados hoje',
+                        '${summary.kmRodadosHoje.toStringAsFixed(1)} km rodados hoje',
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -154,10 +130,10 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 16),
           _MetricCard(
             title: 'Ganho liquido',
-            value: _currency.format(saldoHoje),
-            color: saldoHoje >= 0 ? Colors.greenAccent : Colors.redAccent,
+            value: _currency.format(summary.saldoHoje),
+            color: summary.saldoHoje >= 0 ? Colors.greenAccent : Colors.redAccent,
             subtitle:
-                'Bruto ${_currency.format(ganhosHoje)}  |  Despesas ${_currency.format(despesasHoje)}',
+                'Bruto ${_currency.format(summary.ganhosHoje)}  |  Despesas ${_currency.format(summary.despesasHoje)}',
           ),
           const SizedBox(height: 12),
           Row(
@@ -165,19 +141,19 @@ class _HomePageState extends State<HomePage> {
               Expanded(
                 child: _MetricCard(
                   title: 'Ganho por km',
-                  value: _currency.format(ganhoPorKm),
+                  value: _currency.format(summary.ganhoPorKm),
                   color: Colors.greenAccent,
-                  subtitle: '${kmRodadosHoje.toStringAsFixed(1)} km no dia',
+                  subtitle: '${summary.kmRodadosHoje.toStringAsFixed(1)} km no dia',
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _MetricCard(
                   title: 'Ganho por hora',
-                  value: _currency.format(ganhoPorHora),
+                  value: _currency.format(summary.ganhoPorHora),
                   color: Colors.lightBlueAccent,
                   subtitle:
-                      '${horasTrabalhadasHoje.toStringAsFixed(1)} h do primeiro inicio ao ultimo encerramento',
+                      '${summary.horasTrabalhadasHoje.toStringAsFixed(1)} h do primeiro inicio ao ultimo encerramento',
                 ),
               ),
             ],
@@ -188,10 +164,10 @@ class _HomePageState extends State<HomePage> {
             style: CustomTheme.darkTheme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
-          if (jornadasHoje.isEmpty)
+          if (summary.jornadasHoje.isEmpty)
             const _HomeEmptyState()
           else
-            ...jornadasHoje.take(3).map(
+            ...summary.jornadasHoje.take(3).map(
                   (jornada) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Container(
@@ -226,32 +202,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  Iterable<Jornada> _jornadasDoDia(List<Jornada> jornadas) {
-    final now = DateTime.now();
-    return jornadas.where(
-      (jornada) =>
-          jornada.inicio.year == now.year &&
-          jornada.inicio.month == now.month &&
-          jornada.inicio.day == now.day,
-    );
-  }
-
-  double _horasTrabalhadas(List<Jornada> jornadasHoje) {
-    if (jornadasHoje.isEmpty) {
-      return 0;
-    }
-
-    final inicio = jornadasHoje
-        .map((jornada) => jornada.inicio)
-        .reduce((a, b) => a.isBefore(b) ? a : b);
-    final fim = jornadasHoje
-        .map((jornada) => jornada.fim ?? DateTime.now())
-        .reduce((a, b) => a.isAfter(b) ? a : b);
-
-    final duration = fim.difference(inicio).inMinutes / 60;
-    return duration.isNegative ? 0 : duration;
   }
 }
 
@@ -325,7 +275,8 @@ class _HomeEmptyState extends StatelessWidget {
         children: [
           const Icon(Icons.route, size: 42, color: Colors.lightBlueAccent),
           const SizedBox(height: 12),
-          Text('Nenhum dado hoje', style: CustomTheme.darkTheme.textTheme.bodyMedium),
+          Text('Nenhum dado hoje',
+              style: CustomTheme.darkTheme.textTheme.bodyMedium),
           const SizedBox(height: 8),
           const Text(
             'Comece uma jornada para acompanhar ganhos, despesas e saldo do dia.',
