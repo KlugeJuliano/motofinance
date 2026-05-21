@@ -52,7 +52,7 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
     );
 
     return Scaffold(
-      backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
+      backgroundColor: CustomTheme.background,
       appBar: AppBar(
         title: const Text('Relatorios'),
         centerTitle: true,
@@ -78,28 +78,34 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.lightBlueAccent,
-              borderRadius: BorderRadius.circular(22),
-            ),
+            decoration: CustomTheme.cardDecoration(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  width: 34,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: CustomTheme.primary,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+                const SizedBox(height: 14),
                 Text(
                   _periodo == ReportPeriod.semana
                       ? 'Resumo da semana'
                       : 'Resumo do mes',
                   style: const TextStyle(
-                    color: Colors.black,
+                    color: CustomTheme.textPrimary,
                     fontWeight: FontWeight.w900,
-                    fontSize: 26,
+                    fontSize: 22,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   _tituloIntervalo(report.interval),
                   style: const TextStyle(
-                    color: Colors.black87,
+                    color: CustomTheme.textSecondary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -152,17 +158,17 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
             const _RelatorioVazio()
           else
             ...report.details.map(
-                  (item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _DetalheCard(
-                      label: _dayFormat.format(item.day),
-                      ganhos: _currency.format(item.gains),
-                      despesas: _currency.format(item.expenses),
-                      km: '${item.km.toStringAsFixed(1)} km',
-                      horas: '${item.hours.toStringAsFixed(1)} h',
-                    ),
-                  ),
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _DetalheCard(
+                  label: _dayFormat.format(item.day),
+                  ganhos: _currency.format(item.gains),
+                  despesas: _currency.format(item.expenses),
+                  km: '${item.km.toStringAsFixed(1)} km',
+                  horas: '${item.hours.toStringAsFixed(1)} h',
                 ),
+              ),
+            ),
         ],
       ),
     );
@@ -236,8 +242,8 @@ class _PeriodoSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chipBackground = const Color(0xFF1A1F2B);
-    final chipSelected = const Color(0xFF8BE9FD);
+    const chipBackground = CustomTheme.surface;
+    const chipSelected = CustomTheme.primary;
 
     return Row(
       children: [
@@ -251,7 +257,7 @@ class _PeriodoSwitcher extends StatelessWidget {
             side: BorderSide(
               color: periodo == ReportPeriod.semana
                   ? chipSelected
-                  : Colors.white24,
+                  : CustomTheme.border,
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
@@ -259,7 +265,7 @@ class _PeriodoSwitcher extends StatelessWidget {
             labelStyle: TextStyle(
               color: periodo == ReportPeriod.semana
                   ? Colors.black
-                  : Colors.white70,
+                  : CustomTheme.textSecondary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -275,14 +281,15 @@ class _PeriodoSwitcher extends StatelessWidget {
             side: BorderSide(
               color: periodo == ReportPeriod.mes
                   ? chipSelected
-                  : Colors.white24,
+                  : CustomTheme.border,
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
             labelStyle: TextStyle(
-              color:
-                  periodo == ReportPeriod.mes ? Colors.black : Colors.white70,
+              color: periodo == ReportPeriod.mes
+                  ? Colors.black
+                  : CustomTheme.textSecondary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -306,8 +313,9 @@ class _ResumoMiniCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white24,
+        color: CustomTheme.elevatedSurface,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,7 +323,7 @@ class _ResumoMiniCard extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Colors.black87,
+              color: CustomTheme.textSecondary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -323,7 +331,7 @@ class _ResumoMiniCard extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              color: Colors.black,
+              color: CustomTheme.textPrimary,
               fontWeight: FontWeight.w900,
               fontSize: 20,
             ),
@@ -354,8 +362,9 @@ class _DetalheCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,13 +381,17 @@ class _DetalheCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _ChipInfo(label: 'Km', value: km, color: Colors.lightBlueAccent),
+              _ChipInfo(label: 'Km', value: km, color: CustomTheme.primary),
               _ChipInfo(label: 'Horas', value: horas, color: Colors.blueGrey),
-              _ChipInfo(label: 'Ganhos', value: ganhos, color: Colors.greenAccent),
+              _ChipInfo(
+                label: 'Ganhos',
+                value: ganhos,
+                color: CustomTheme.success,
+              ),
               _ChipInfo(
                 label: 'Despesas',
                 value: despesas,
-                color: Colors.orangeAccent,
+                color: CustomTheme.warning,
               ),
             ],
           ),
@@ -404,13 +417,14 @@ class _ChipInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: color,
+        color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.36)),
       ),
       child: Text(
         '$label: $value',
-        style: const TextStyle(
-          color: Colors.black,
+        style: TextStyle(
+          color: color,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -426,12 +440,13 @@ class _RelatorioVazio extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: Column(
         children: [
-          const Icon(Icons.bar_chart, size: 42, color: Colors.lightBlueAccent),
+          const Icon(Icons.bar_chart, size: 42, color: CustomTheme.primary),
           const SizedBox(height: 12),
           Text(
             'Sem dados no periodo',

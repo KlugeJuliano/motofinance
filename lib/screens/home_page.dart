@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-      backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
+      backgroundColor: CustomTheme.background,
       appBar: AppBar(
         title: Column(
           children: [
@@ -59,7 +59,11 @@ class _HomePageState extends State<HomePage> {
             ),
             Text(
               DateFormat('dd/MM/yyyy').format(summary.referenceDate),
-              style: const TextStyle(fontSize: 16, color: Colors.white70),
+              style: const TextStyle(
+                fontSize: 13,
+                color: CustomTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -70,9 +74,8 @@ class _HomePageState extends State<HomePage> {
         children: [
           Container(
             padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.lightBlueAccent,
-              borderRadius: BorderRadius.circular(22),
+            decoration: CustomTheme.cardDecoration(
+              color: CustomTheme.elevatedSurface,
             ),
             child: Row(
               children: [
@@ -80,13 +83,13 @@ class _HomePageState extends State<HomePage> {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(18),
+                    color: const Color(0x2457C7FF),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(
                     Icons.two_wheeler,
                     size: 38,
-                    color: Colors.black,
+                    color: CustomTheme.primary,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -97,9 +100,9 @@ class _HomePageState extends State<HomePage> {
                       const Text(
                         'Resumo rapido',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: CustomTheme.textPrimary,
                           fontWeight: FontWeight.w800,
-                          fontSize: 24,
+                          fontSize: 22,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -108,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                             ? 'Sem jornada aberta neste momento'
                             : 'Jornada aberta desde ${DateFormat('HH:mm').format(summary.jornadaAberta!.inicio)}',
                         style: const TextStyle(
-                          color: Colors.black87,
+                          color: CustomTheme.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -116,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         '${summary.kmRodadosHoje.toStringAsFixed(1)} km rodados hoje',
                         style: const TextStyle(
-                          color: Colors.black,
+                          color: CustomTheme.primary,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -131,7 +134,9 @@ class _HomePageState extends State<HomePage> {
           _MetricCard(
             title: 'Ganho liquido',
             value: _currency.format(summary.saldoHoje),
-            color: summary.saldoHoje >= 0 ? Colors.greenAccent : Colors.redAccent,
+            color: summary.saldoHoje >= 0
+                ? CustomTheme.success
+                : CustomTheme.danger,
             subtitle:
                 'Bruto ${_currency.format(summary.ganhosHoje)}  |  Despesas ${_currency.format(summary.despesasHoje)}',
           ),
@@ -142,8 +147,9 @@ class _HomePageState extends State<HomePage> {
                 child: _MetricCard(
                   title: 'Ganho por km',
                   value: _currency.format(summary.ganhoPorKm),
-                  color: Colors.greenAccent,
-                  subtitle: '${summary.kmRodadosHoje.toStringAsFixed(1)} km no dia',
+                  color: CustomTheme.success,
+                  subtitle:
+                      '${summary.kmRodadosHoje.toStringAsFixed(1)} km no dia',
                 ),
               ),
               const SizedBox(width: 12),
@@ -151,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                 child: _MetricCard(
                   title: 'Ganho por hora',
                   value: _currency.format(summary.ganhoPorHora),
-                  color: Colors.lightBlueAccent,
+                  color: CustomTheme.primary,
                   subtitle:
                       '${summary.horasTrabalhadasHoje.toStringAsFixed(1)} h do primeiro inicio ao ultimo encerramento',
                 ),
@@ -172,10 +178,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white10,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
+                      decoration: CustomTheme.cardDecoration(),
                       child: Row(
                         children: [
                           Icon(
@@ -183,8 +186,8 @@ class _HomePageState extends State<HomePage> {
                                 ? Icons.timelapse
                                 : Icons.check_circle,
                             color: jornada.fim == null
-                                ? Colors.orangeAccent
-                                : Colors.greenAccent,
+                                ? CustomTheme.warning
+                                : CustomTheme.success,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -222,35 +225,43 @@ class _MetricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20),
+      decoration: CustomTheme.cardDecoration(
+        color: CustomTheme.surface,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: 34,
+            height: 4,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+          const SizedBox(height: 14),
           Text(
             title,
             style: const TextStyle(
-              color: Colors.black,
+              color: CustomTheme.textSecondary,
               fontWeight: FontWeight.w800,
-              fontSize: 22,
+              fontSize: 14,
             ),
           ),
           const SizedBox(height: 10),
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.black,
+            style: TextStyle(
+              color: color,
               fontWeight: FontWeight.w900,
-              fontSize: 28,
+              fontSize: 26,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
             style: const TextStyle(
-              color: Colors.black87,
+              color: CustomTheme.textSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -267,13 +278,10 @@ class _HomeEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: CustomTheme.cardDecoration(),
       child: Column(
         children: [
-          const Icon(Icons.route, size: 42, color: Colors.lightBlueAccent),
+          const Icon(Icons.route, size: 42, color: CustomTheme.primary),
           const SizedBox(height: 12),
           Text('Nenhum dado hoje',
               style: CustomTheme.darkTheme.textTheme.bodyMedium),

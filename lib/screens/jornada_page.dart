@@ -37,7 +37,7 @@ class _JornadaPageState extends State<JornadaPage> {
     final jornadaAberta = jornadaProvider.jornadaAberta;
 
     return Scaffold(
-      backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
+      backgroundColor: CustomTheme.background,
       appBar: AppBar(
         title: const Text('Jornada'),
         centerTitle: true,
@@ -75,7 +75,8 @@ class _JornadaPageState extends State<JornadaPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: jornadaAberta == null ? Colors.lightBlueAccent : Colors.orangeAccent,
+        backgroundColor:
+            jornadaAberta == null ? CustomTheme.primary : CustomTheme.warning,
         foregroundColor: Colors.black,
         onPressed: () {
           if (jornadaAberta == null) {
@@ -84,8 +85,11 @@ class _JornadaPageState extends State<JornadaPage> {
           }
           _abrirFinalizacao(context, jornadaAberta);
         },
-        icon: Icon(jornadaAberta == null ? Icons.play_arrow : Icons.stop_circle_outlined),
-        label: Text(jornadaAberta == null ? 'Iniciar jornada' : 'Fechar jornada'),
+        icon: Icon(jornadaAberta == null
+            ? Icons.play_arrow
+            : Icons.stop_circle_outlined),
+        label:
+            Text(jornadaAberta == null ? 'Iniciar jornada' : 'Fechar jornada'),
       ),
     );
   }
@@ -124,7 +128,8 @@ class _JornadaPageState extends State<JornadaPage> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: kmController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   autofocus: true,
                   style: const TextStyle(
                     fontSize: 20,
@@ -133,7 +138,8 @@ class _JornadaPageState extends State<JornadaPage> {
                   ),
                   decoration: _inputDecoration('Km inicial'),
                   validator: (value) {
-                    final km = double.tryParse((value ?? '').replaceAll(',', '.'));
+                    final km =
+                        double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (km == null) {
                       return 'Informe um valor valido';
                     }
@@ -148,7 +154,7 @@ class _JornadaPageState extends State<JornadaPage> {
                   width: double.infinity,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.lightBlueAccent,
+                      backgroundColor: CustomTheme.primary,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -159,13 +165,16 @@ class _JornadaPageState extends State<JornadaPage> {
                       final kmInicial =
                           double.parse(kmController.text.replaceAll(',', '.'));
                       try {
-                        await context.read<JornadaProvider>().iniciarJornada(kmInicial);
+                        await context
+                            .read<JornadaProvider>()
+                            .iniciarJornada(kmInicial);
                         if (context.mounted) {
                           Navigator.of(sheetContext).pop();
                           _showMessage('Jornada iniciada');
                         }
                       } catch (error) {
-                        _showMessage(error.toString().replaceFirst('Exception: ', ''));
+                        _showMessage(
+                            error.toString().replaceFirst('Exception: ', ''));
                       }
                     },
                     child: const Text('Iniciar'),
@@ -214,7 +223,8 @@ class _JornadaPageState extends State<JornadaPage> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: kmController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   autofocus: true,
                   style: const TextStyle(
                     fontSize: 20,
@@ -223,7 +233,8 @@ class _JornadaPageState extends State<JornadaPage> {
                   ),
                   decoration: _inputDecoration('Km final'),
                   validator: (value) {
-                    final km = double.tryParse((value ?? '').replaceAll(',', '.'));
+                    final km =
+                        double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (km == null) {
                       return 'Informe um valor valido';
                     }
@@ -236,7 +247,8 @@ class _JornadaPageState extends State<JornadaPage> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: ganhoController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   style: const TextStyle(
                     fontSize: 20,
                     color: Colors.white,
@@ -244,7 +256,8 @@ class _JornadaPageState extends State<JornadaPage> {
                   ),
                   decoration: _inputDecoration('Ganho total do dia'),
                   validator: (value) {
-                    final ganho = double.tryParse((value ?? '').replaceAll(',', '.'));
+                    final ganho =
+                        double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (ganho == null) {
                       return 'Informe um valor valido';
                     }
@@ -259,25 +272,27 @@ class _JornadaPageState extends State<JornadaPage> {
                   width: double.infinity,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
+                      backgroundColor: CustomTheme.warning,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     onPressed: () async {
-                      if (!formKey.currentState!.validate() || jornada.id == null) {
+                      if (!formKey.currentState!.validate() ||
+                          jornada.id == null) {
                         return;
                       }
                       final jornadaProvider = context.read<JornadaProvider>();
                       final ganhoProvider = context.read<GanhoProvider>();
                       final kmFinal =
                           double.parse(kmController.text.replaceAll(',', '.'));
-                      final ganhoTotal =
-                          double.parse(ganhoController.text.replaceAll(',', '.'));
-                      await jornadaProvider.finalizarJornada(jornada.id!, kmFinal);
+                      final ganhoTotal = double.parse(
+                          ganhoController.text.replaceAll(',', '.'));
+                      await jornadaProvider.finalizarJornada(
+                          jornada.id!, kmFinal);
                       await ganhoProvider.salvarGanhoPrincipal(
-                            jornadaId: jornada.id!,
-                            valor: ganhoTotal,
-                          );
+                        jornadaId: jornada.id!,
+                        valor: ganhoTotal,
+                      );
                       if (context.mounted) {
                         Navigator.of(sheetContext).pop();
                         _showMessage(
@@ -300,7 +315,7 @@ class _JornadaPageState extends State<JornadaPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: Colors.white12,
+      fillColor: CustomTheme.elevatedSurface,
       labelStyle: const TextStyle(
         color: Colors.white70,
         fontWeight: FontWeight.w600,
@@ -311,11 +326,11 @@ class _JornadaPageState extends State<JornadaPage> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.white24, width: 1.2),
+        borderSide: const BorderSide(color: CustomTheme.border, width: 1.2),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.lightBlueAccent, width: 2),
+        borderSide: const BorderSide(color: CustomTheme.primary, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -327,7 +342,7 @@ class _JornadaPageState extends State<JornadaPage> {
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.white24),
+        borderSide: const BorderSide(color: CustomTheme.border),
       ),
     );
   }
@@ -351,22 +366,28 @@ class _StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor =
-        jornadaAberta == null ? Colors.greenAccent : Colors.orangeAccent;
+        jornadaAberta == null ? CustomTheme.success : CustomTheme.warning;
 
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: statusColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: CustomTheme.cardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: 34,
+            height: 4,
+            decoration: BoxDecoration(
+              color: statusColor,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+          const SizedBox(height: 14),
           Text(
             jornadaAberta == null ? 'Sem jornada aberta' : 'Rodando agora',
             style: const TextStyle(
-              color: Colors.black,
-              fontSize: 24,
+              color: CustomTheme.textPrimary,
+              fontSize: 22,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -376,7 +397,7 @@ class _StatusCard extends StatelessWidget {
                 ? 'Quando sair para trabalhar, toque em iniciar jornada.'
                 : 'Inicio as ${timeFormat.format(jornadaAberta!.inicio)}  |  Km inicial ${jornadaAberta!.kmInicial.toStringAsFixed(1)}',
             style: const TextStyle(
-              color: Colors.black87,
+              color: CustomTheme.textSecondary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -402,16 +423,14 @@ class _JornadaTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         title: Text(
-          jornada.fim == null
-              ? 'Jornada em andamento'
-              : 'Jornada encerrada',
+          jornada.fim == null ? 'Jornada em andamento' : 'Jornada encerrada',
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -427,12 +446,14 @@ class _JornadaTile extends StatelessWidget {
           ),
         ),
         trailing: onFinish == null
-            ? const Icon(Icons.check_circle, color: Colors.greenAccent)
+            ? const Icon(Icons.check_circle, color: CustomTheme.success)
             : FilledButton(
                 onPressed: onFinish,
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
+                  backgroundColor: CustomTheme.warning,
                   foregroundColor: Colors.black,
+                  minimumSize: const Size(82, 40),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
                 ),
                 child: const Text('Fechar'),
               ),
@@ -457,12 +478,13 @@ class _EmptyState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 42, color: Colors.lightBlueAccent),
+          Icon(icon, size: 42, color: CustomTheme.primary),
           const SizedBox(height: 12),
           Text(title, style: CustomTheme.darkTheme.textTheme.bodyMedium),
           const SizedBox(height: 8),

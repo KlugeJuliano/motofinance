@@ -41,7 +41,7 @@ class _GanhosPageState extends State<GanhosPage> {
     final totalExtras = ganhoProvider.totalGanhosExtras;
 
     return Scaffold(
-      backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
+      backgroundColor: CustomTheme.background,
       appBar: AppBar(
         title: const Text('Ganhos extras'),
         centerTitle: true,
@@ -51,18 +51,24 @@ class _GanhosPageState extends State<GanhosPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.greenAccent,
-              borderRadius: BorderRadius.circular(20),
-            ),
+            decoration: CustomTheme.cardDecoration(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  width: 34,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: CustomTheme.success,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+                const SizedBox(height: 14),
                 const Text(
                   'Entradas extras',
                   style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
+                    color: CustomTheme.textPrimary,
+                    fontSize: 20,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -70,15 +76,18 @@ class _GanhosPageState extends State<GanhosPage> {
                 Text(
                   _currency.format(totalExtras),
                   style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
+                    color: CustomTheme.success,
+                    fontSize: 28,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Use esta tela para bonus, taxa extra, caixinha ou qualquer valor fora do ganho principal do dia.',
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: CustomTheme.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -92,21 +101,21 @@ class _GanhosPageState extends State<GanhosPage> {
             )
           else
             ...ganhosExtras.map(
-                  (ganho) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _GanhoTile(
-                      ganho: ganho,
-                      currency: _currency,
-                      onDelete: () =>
-                          context.read<GanhoProvider>().removerGanho(ganho.id!),
-                    ),
-                  ),
+              (ganho) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _GanhoTile(
+                  ganho: ganho,
+                  currency: _currency,
+                  onDelete: () =>
+                      context.read<GanhoProvider>().removerGanho(ganho.id!),
                 ),
+              ),
+            ),
           const SizedBox(height: 88),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: CustomTheme.success,
         foregroundColor: Colors.black,
         onPressed: () => _abrirFormulario(context, jornadaProvider),
         label: const Text('Adicionar extra'),
@@ -176,7 +185,8 @@ class _GanhosPageState extends State<GanhosPage> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: valorController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   style: const TextStyle(
                     fontSize: 20,
                     color: Colors.white,
@@ -184,7 +194,8 @@ class _GanhosPageState extends State<GanhosPage> {
                   ),
                   decoration: _inputDecoration('Valor'),
                   validator: (value) {
-                    final valor = double.tryParse((value ?? '').replaceAll(',', '.'));
+                    final valor =
+                        double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (valor == null) {
                       return 'Informe um valor valido';
                     }
@@ -199,7 +210,7 @@ class _GanhosPageState extends State<GanhosPage> {
                   width: double.infinity,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.greenAccent,
+                      backgroundColor: CustomTheme.success,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -207,8 +218,8 @@ class _GanhosPageState extends State<GanhosPage> {
                       if (!formKey.currentState!.validate()) {
                         return;
                       }
-                      final valor =
-                          double.parse(valorController.text.replaceAll(',', '.'));
+                      final valor = double.parse(
+                          valorController.text.replaceAll(',', '.'));
                       await context.read<GanhoProvider>().adicionarGanho(
                             Ganho(
                               id: null,
@@ -238,7 +249,7 @@ class _GanhosPageState extends State<GanhosPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: Colors.white12,
+      fillColor: CustomTheme.elevatedSurface,
       labelStyle: const TextStyle(
         color: Colors.white70,
         fontWeight: FontWeight.w600,
@@ -249,11 +260,11 @@ class _GanhosPageState extends State<GanhosPage> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.white24, width: 1.2),
+        borderSide: const BorderSide(color: CustomTheme.border, width: 1.2),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.greenAccent, width: 2),
+        borderSide: const BorderSide(color: CustomTheme.success, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -265,7 +276,7 @@ class _GanhosPageState extends State<GanhosPage> {
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.white24),
+        borderSide: const BorderSide(color: CustomTheme.border),
       ),
     );
   }
@@ -292,9 +303,9 @@ class _GanhoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -315,7 +326,7 @@ class _GanhoTile extends StatelessWidget {
         trailing: Text(
           currency.format(ganho.valor),
           style: const TextStyle(
-            color: Colors.greenAccent,
+            color: CustomTheme.success,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -341,12 +352,13 @@ class _SimpleEmptyState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 42, color: Colors.greenAccent),
+          Icon(icon, size: 42, color: CustomTheme.success),
           const SizedBox(height: 12),
           Text(title, style: CustomTheme.darkTheme.textTheme.bodyMedium),
           const SizedBox(height: 8),

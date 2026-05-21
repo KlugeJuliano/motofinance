@@ -41,7 +41,7 @@ class _SpendingPageState extends State<SpendingPage> {
     final totalDespesas = despesaProvider.totalDespesas;
 
     return Scaffold(
-      backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
+      backgroundColor: CustomTheme.background,
       appBar: AppBar(
         title: const Text('Despesas'),
         centerTitle: true,
@@ -51,18 +51,24 @@ class _SpendingPageState extends State<SpendingPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.orangeAccent,
-              borderRadius: BorderRadius.circular(20),
-            ),
+            decoration: CustomTheme.cardDecoration(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  width: 34,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: CustomTheme.warning,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+                const SizedBox(height: 14),
                 const Text(
                   'Despesas do periodo',
                   style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
+                    color: CustomTheme.textPrimary,
+                    fontSize: 20,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -70,15 +76,18 @@ class _SpendingPageState extends State<SpendingPage> {
                 Text(
                   _currency.format(totalDespesas),
                   style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
+                    color: CustomTheme.warning,
+                    fontSize: 28,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Exemplo: gasolina, refeicao, estacionamento ou manutencao.',
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: CustomTheme.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -92,22 +101,22 @@ class _SpendingPageState extends State<SpendingPage> {
             )
           else
             ...despesas.map(
-                  (despesa) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _DespesaTile(
-                      despesa: despesa,
-                      currency: _currency,
-                      onDelete: () => context
-                          .read<DespesaProvider>()
-                          .excluirDespesa(despesa.id!),
-                    ),
-                  ),
+              (despesa) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _DespesaTile(
+                  despesa: despesa,
+                  currency: _currency,
+                  onDelete: () => context
+                      .read<DespesaProvider>()
+                      .excluirDespesa(despesa.id!),
                 ),
+              ),
+            ),
           const SizedBox(height: 88),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: CustomTheme.warning,
         foregroundColor: Colors.black,
         onPressed: () => _abrirFormulario(context, jornadaProvider),
         label: const Text('Adicionar despesa'),
@@ -177,7 +186,8 @@ class _SpendingPageState extends State<SpendingPage> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: valorController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   style: const TextStyle(
                     fontSize: 20,
                     color: Colors.white,
@@ -185,7 +195,8 @@ class _SpendingPageState extends State<SpendingPage> {
                   ),
                   decoration: _inputDecoration('Valor'),
                   validator: (value) {
-                    final valor = double.tryParse((value ?? '').replaceAll(',', '.'));
+                    final valor =
+                        double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (valor == null) {
                       return 'Informe um valor valido';
                     }
@@ -200,7 +211,7 @@ class _SpendingPageState extends State<SpendingPage> {
                   width: double.infinity,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
+                      backgroundColor: CustomTheme.warning,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -208,8 +219,8 @@ class _SpendingPageState extends State<SpendingPage> {
                       if (!formKey.currentState!.validate()) {
                         return;
                       }
-                      final valor =
-                          double.parse(valorController.text.replaceAll(',', '.'));
+                      final valor = double.parse(
+                          valorController.text.replaceAll(',', '.'));
                       await context.read<DespesaProvider>().inserirDespesa(
                             Despesa(
                               id: null,
@@ -238,7 +249,7 @@ class _SpendingPageState extends State<SpendingPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: Colors.white12,
+      fillColor: CustomTheme.elevatedSurface,
       labelStyle: const TextStyle(
         color: Colors.white70,
         fontWeight: FontWeight.w600,
@@ -249,11 +260,11 @@ class _SpendingPageState extends State<SpendingPage> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.white24, width: 1.2),
+        borderSide: const BorderSide(color: CustomTheme.border, width: 1.2),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
+        borderSide: const BorderSide(color: CustomTheme.warning, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -265,7 +276,7 @@ class _SpendingPageState extends State<SpendingPage> {
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.white24),
+        borderSide: const BorderSide(color: CustomTheme.border),
       ),
     );
   }
@@ -292,9 +303,9 @@ class _DespesaTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -315,7 +326,7 @@ class _DespesaTile extends StatelessWidget {
         trailing: Text(
           currency.format(despesa.valor),
           style: const TextStyle(
-            color: Colors.orangeAccent,
+            color: CustomTheme.warning,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -341,12 +352,13 @@ class _EmptyState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white10,
+        color: CustomTheme.surface,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: CustomTheme.border),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 42, color: Colors.orangeAccent),
+          Icon(icon, size: 42, color: CustomTheme.warning),
           const SizedBox(height: 12),
           Text(title, style: CustomTheme.darkTheme.textTheme.bodyMedium),
           const SizedBox(height: 8),
