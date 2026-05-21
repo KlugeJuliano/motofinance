@@ -6,6 +6,7 @@
 ![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart)
 ![Plataforma](https://img.shields.io/badge/Plataforma-Android-3DDC84?logo=android)
 ![Licença](https://img.shields.io/badge/Licença-MIT-green)
+![Flutter CI](https://github.com/KlugeJuliano/motofinance/actions/workflows/flutter_ci.yml/badge.svg)
 
 ---
 
