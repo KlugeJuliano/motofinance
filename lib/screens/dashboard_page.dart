@@ -30,7 +30,7 @@ class _DashboardPageState extends State<DashboardPage> {
       RelatoriosPage(loadData: widget.loadData),
     ];
     return Scaffold(
-      backgroundColor: CustomTheme.darkTheme.scaffoldBackgroundColor,
+      backgroundColor: CustomTheme.background,
       body: IndexedStack(
         index: navigation.currentIndex,
         children: telas,
@@ -38,13 +38,13 @@ class _DashboardPageState extends State<DashboardPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigation.currentIndex,
         onTap: (index) => navigation.setCurrentIndex(index),
-        backgroundColor: Colors.black,
+        backgroundColor: CustomTheme.surface,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Início',
-              backgroundColor: Colors.black12),
+              backgroundColor: CustomTheme.surface),
           BottomNavigationBarItem(icon: Icon(Icons.flag), label: 'Jornada'),
           BottomNavigationBarItem(
               icon: Icon(Icons.attach_money), label: 'Ganhos'),
@@ -53,8 +53,8 @@ class _DashboardPageState extends State<DashboardPage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart), label: 'Relatorios'),
         ],
-        selectedItemColor: Colors.amber[800],
-        unselectedItemColor: Colors.white70,
+        selectedItemColor: CustomTheme.warning,
+        unselectedItemColor: CustomTheme.textSecondary,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
       ),

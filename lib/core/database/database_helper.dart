@@ -15,7 +15,7 @@ class DatabaseHelperException implements Exception {
 
 class DatabaseHelper {
   static const _databaseName = 'motofinance.db';
-  static const _databaseVersion = 2;
+  static const _databaseVersion = 3;
 
   static Database? _database;
 
@@ -62,7 +62,8 @@ class DatabaseHelper {
   static Future<Database> _openDatabase({String? pathOverride}) async {
     try {
       final factory = _databaseFactory;
-      final path = pathOverride ?? join(await getDatabasesPath(), _databaseName);
+      final path =
+          pathOverride ?? join(await getDatabasesPath(), _databaseName);
 
       return await factory.openDatabase(
         path,
@@ -77,6 +78,9 @@ class DatabaseHelper {
           onUpgrade: (db, oldVersion, newVersion) async {
             if (oldVersion < 2) {
               await _migrateToV2(db);
+            }
+            if (oldVersion < 3) {
+              await _migrateToV3(db);
             }
           },
         ),
@@ -184,6 +188,31 @@ class DatabaseHelper {
       await db.execute(
         "ALTER TABLE ganhos ADD COLUMN tipo TEXT NOT NULL DEFAULT 'extra'",
       );
+    }
+  }
+
+  /// Migração da versão 2 para a versão 3.
+  /// Recria as tabelas para garantir que km_inicial aceite zero.
+  static Future<void> _migrateToV3(Database db) async {
+    final jornadas = await db.query('jornadas');
+    final ganhos = await db.query('ganhos');
+    final despesas = await db.query('despesas');
+
+    await db.execute('DROP TABLE IF EXISTS despesas');
+    await db.execute('DROP TABLE IF EXISTS ganhos');
+    await db.execute('DROP TABLE IF EXISTS jornadas');
+    await _createTables(db);
+
+    for (final jornada in jornadas) {
+      await db.insert('jornadas', jornada);
+    }
+
+    for (final ganho in ganhos) {
+      await db.insert('ganhos', ganho);
+    }
+
+    for (final despesa in despesas) {
+      await db.insert('despesas', despesa);
     }
   }
 }
