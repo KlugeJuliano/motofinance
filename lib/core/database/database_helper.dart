@@ -134,7 +134,7 @@ class DatabaseHelper {
   }
 
   /// Cria as tabelas do banco de dados: jornadas, ganhos e despesas.
-  static Future<void> _createTables(Database db) async {
+  static Future<void> _createTables(DatabaseExecutor db) async {
     try {
       await db.execute('''
         CREATE TABLE jornadas (
@@ -198,21 +198,23 @@ class DatabaseHelper {
     final ganhos = await db.query('ganhos');
     final despesas = await db.query('despesas');
 
-    await db.execute('DROP TABLE IF EXISTS despesas');
-    await db.execute('DROP TABLE IF EXISTS ganhos');
-    await db.execute('DROP TABLE IF EXISTS jornadas');
-    await _createTables(db);
+    await db.transaction((txn) async {
+      await txn.execute('DROP TABLE IF EXISTS despesas');
+      await txn.execute('DROP TABLE IF EXISTS ganhos');
+      await txn.execute('DROP TABLE IF EXISTS jornadas');
+      await _createTables(txn);
 
-    for (final jornada in jornadas) {
-      await db.insert('jornadas', jornada);
-    }
+      for (final jornada in jornadas) {
+        await txn.insert('jornadas', jornada);
+      }
 
-    for (final ganho in ganhos) {
-      await db.insert('ganhos', ganho);
-    }
+      for (final ganho in ganhos) {
+        await txn.insert('ganhos', ganho);
+      }
 
-    for (final despesa in despesas) {
-      await db.insert('despesas', despesa);
-    }
+      for (final despesa in despesas) {
+        await txn.insert('despesas', despesa);
+      }
+    });
   }
 }

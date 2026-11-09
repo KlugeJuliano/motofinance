@@ -77,7 +77,7 @@ void main() {
         'categoria': 'Combustivel',
       });
 
-      await jornadaRepository.limparBanco();
+      await jornadaRepository.limparTodosDados();
 
       expect(await db.query('jornadas'), isEmpty);
       expect(await db.query('ganhos'), isEmpty);

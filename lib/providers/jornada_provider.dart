@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:motofinance/models/jornada_model.dart';
+import 'package:motofinance/services/finance_metrics_service.dart';
 
 import '../repositories/jornada_repository.dart';
 
@@ -28,9 +29,7 @@ class JornadaProvider with ChangeNotifier {
 
     final now = DateTime.now();
     for (final jornada in _jornadas) {
-      if (jornada.inicio.year == now.year &&
-          jornada.inicio.month == now.month &&
-          jornada.inicio.day == now.day) {
+      if (FinanceMetricsService.isSameDay(jornada.inicio, now)) {
         return jornada;
       }
     }
@@ -44,7 +43,7 @@ class JornadaProvider with ChangeNotifier {
 
   Future<void> iniciarJornada(double kmInicial) async {
     if (jornadaAberta != null) {
-      throw Exception('Ja existe uma jornada aberta');
+      throw Exception('Já existe uma jornada aberta');
     }
     final jornada =
         Jornada(inicio: DateTime.now(), kmInicial: kmInicial, fim: null);
@@ -57,8 +56,8 @@ class JornadaProvider with ChangeNotifier {
     await carregarJornadas();
   }
 
-  Future<void> limparBanco() async {
-    await repository.limparBanco();
+  Future<void> limparTodosDados() async {
+    await repository.limparTodosDados();
     _jornadas = [];
     notifyListeners();
   }

@@ -48,7 +48,7 @@ class _JornadaPageState extends State<JornadaPage> {
           _StatusCard(jornadaAberta: jornadaAberta, timeFormat: _timeFormat),
           const SizedBox(height: 16),
           Text(
-            'Historico de hoje',
+            'Últimas jornadas',
             style: CustomTheme.darkTheme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
@@ -56,7 +56,7 @@ class _JornadaPageState extends State<JornadaPage> {
             _EmptyState(
               icon: Icons.two_wheeler,
               title: 'Nenhuma jornada iniciada',
-              subtitle: 'Toque no botao abaixo quando comecar a rodar.',
+              subtitle: 'Toque no botão abaixo quando começar a rodar.',
             )
           else
             ...jornadas.take(8).map(
@@ -120,7 +120,7 @@ class _JornadaPageState extends State<JornadaPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Comecar agora',
+                  'Começar agora',
                   style: CustomTheme.darkTheme.textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 8),
@@ -141,10 +141,10 @@ class _JornadaPageState extends State<JornadaPage> {
                     final km =
                         double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (km == null) {
-                      return 'Informe um valor valido';
+                      return 'Informe um valor válido';
                     }
                     if (km < 0) {
-                      return 'O km nao pode ser negativo';
+                      return 'O km não pode ser negativo';
                     }
                     return null;
                   },
@@ -236,7 +236,7 @@ class _JornadaPageState extends State<JornadaPage> {
                     final km =
                         double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (km == null) {
-                      return 'Informe um valor valido';
+                      return 'Informe um valor válido';
                     }
                     if (km < jornada.kmInicial) {
                       return 'O km final deve ser maior que o inicial';
@@ -259,10 +259,10 @@ class _JornadaPageState extends State<JornadaPage> {
                     final ganho =
                         double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (ganho == null) {
-                      return 'Informe um valor valido';
+                      return 'Informe um valor válido';
                     }
                     if (ganho < 0) {
-                      return 'O ganho nao pode ser negativo';
+                      return 'O ganho não pode ser negativo';
                     }
                     return null;
                   },
@@ -281,23 +281,34 @@ class _JornadaPageState extends State<JornadaPage> {
                           jornada.id == null) {
                         return;
                       }
-                      final jornadaProvider = context.read<JornadaProvider>();
-                      final ganhoProvider = context.read<GanhoProvider>();
-                      final kmFinal =
-                          double.parse(kmController.text.replaceAll(',', '.'));
-                      final ganhoTotal = double.parse(
-                          ganhoController.text.replaceAll(',', '.'));
-                      await jornadaProvider.finalizarJornada(
-                          jornada.id!, kmFinal);
-                      await ganhoProvider.salvarGanhoPrincipal(
-                        jornadaId: jornada.id!,
-                        valor: ganhoTotal,
-                      );
-                      if (context.mounted) {
-                        Navigator.of(sheetContext).pop();
-                        _showMessage(
-                          'Jornada fechada com ${_currency.format(ganhoTotal)}',
+                      try {
+                        final jornadaProvider =
+                            context.read<JornadaProvider>();
+                        final ganhoProvider = context.read<GanhoProvider>();
+                        final kmFinal =
+                            double.parse(kmController.text.replaceAll(',', '.'));
+                        final ganhoTotal = double.parse(
+                            ganhoController.text.replaceAll(',', '.'));
+                        await jornadaProvider.finalizarJornada(
+                          jornada.id!,
+                          kmFinal,
                         );
+                        await ganhoProvider.salvarGanhoPrincipal(
+                          jornadaId: jornada.id!,
+                          valor: ganhoTotal,
+                        );
+                        if (context.mounted) {
+                          Navigator.of(sheetContext).pop();
+                          _showMessage(
+                            'Jornada fechada com ${_currency.format(ganhoTotal)}',
+                          );
+                        }
+                      } catch (error) {
+                        if (context.mounted) {
+                          _showMessage(
+                            error.toString().replaceFirst('Exception: ', ''),
+                          );
+                        }
                       }
                     },
                     child: const Text('Fechar jornada'),

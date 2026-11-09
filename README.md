@@ -91,7 +91,7 @@ test/
 ```mermaid
 flowchart TD
     UI[Screens / Widgets] --> STATE[Providers]
-    STATE --> SERVICE[Business Services]
+    UI --> SERVICE[Business Services]
     STATE --> REPO[Repositories]
     SERVICE --> MODEL[Models]
     REPO --> DB[(SQLite Database)]

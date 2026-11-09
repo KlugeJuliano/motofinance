@@ -89,7 +89,7 @@ class FinanceMetricsService {
   }) {
     final reference = now ?? DateTime.now();
     final jornadasHoje = jornadas
-        .where((jornada) => _isSameDay(jornada.inicio, reference))
+        .where((jornada) => isSameDay(jornada.inicio, reference))
         .toList();
     final jornadaAberta = jornadas.cast<Jornada?>().firstWhere(
           (jornada) => jornada?.fim == null,
@@ -250,7 +250,7 @@ class FinanceMetricsService {
     return duration.isNegative ? 0 : duration;
   }
 
-  bool _isSameDay(DateTime a, DateTime b) {
+  static bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

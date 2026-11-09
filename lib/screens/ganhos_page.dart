@@ -197,7 +197,7 @@ class _GanhosPageState extends State<GanhosPage> {
                     final valor =
                         double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (valor == null) {
-                      return 'Informe um valor valido';
+                      return 'Informe um valor válido';
                     }
                     if (valor <= 0) {
                       return 'O valor deve ser maior que zero';

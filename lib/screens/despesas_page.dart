@@ -165,7 +165,7 @@ class _SpendingPageState extends State<SpendingPage> {
                   style: CustomTheme.darkTheme.textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 8),
-                const Text('Nao precisa informar corrida ou jornada.'),
+                const Text('Não precisa informar corrida ou jornada.'),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: categoriaController,
@@ -198,7 +198,7 @@ class _SpendingPageState extends State<SpendingPage> {
                     final valor =
                         double.tryParse((value ?? '').replaceAll(',', '.'));
                     if (valor == null) {
-                      return 'Informe um valor valido';
+                      return 'Informe um valor válido';
                     }
                     if (valor <= 0) {
                       return 'O valor deve ser maior que zero';

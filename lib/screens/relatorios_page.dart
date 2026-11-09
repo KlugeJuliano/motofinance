@@ -191,7 +191,7 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
           backgroundColor: const Color(0xFF111111),
           title: const Text('Zerar dados do app?'),
           content: const Text(
-            'Essa acao apaga jornadas, ganhos e despesas salvos no aparelho. Essa operacao nao pode ser desfeita.',
+            'Essa ação apaga jornadas, ganhos e despesas salvos no aparelho. Essa operação não pode ser desfeita.',
           ),
           actions: [
             TextButton(
@@ -215,7 +215,7 @@ class _RelatoriosPageState extends State<RelatoriosPage> {
       return;
     }
 
-    await jornadaProvider.limparBanco();
+    await jornadaProvider.limparTodosDados();
     await ganhoProvider.carregarGanhos();
     await despesaProvider.carregarDespesas();
 

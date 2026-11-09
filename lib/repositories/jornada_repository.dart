@@ -21,20 +21,29 @@ class JornadaRepository {
     if (result.isEmpty) {
       throw Exception('Jornada ID $id não encontrada');
     }
-    final kmInicial = result.first['km_inicial'] as num;
+    final kmInicialValue = result.first['km_inicial'];
+    if (kmInicialValue == null) {
+      throw Exception('Jornada sem quilometragem inicial registrada');
+    }
+    final kmInicial = (kmInicialValue as num).toDouble();
+    if (kmFinal < kmInicial) {
+      throw Exception(
+        'O km final não pode ser menor que o km inicial ($kmInicial km)',
+      );
+    }
     await db.update(
       'jornadas',
       {
         'fim': DateTime.now().toIso8601String(),
         'km_final': kmFinal,
-        'km_rodados': kmFinal - kmInicial.toDouble(),
+        'km_rodados': kmFinal - kmInicial,
       },
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 
-  Future<void> limparBanco() async {
+  Future<void> limparTodosDados() async {
     await db.transaction((txn) async {
       await txn.delete('ganhos');
       await txn.delete('despesas');
